@@ -1,5 +1,5 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- * Copyright (c) 2019 SAP SE or an affiliate company. All rights reserved.
+ * Copyright (c) 2020 SAP SE or an affiliate company. All rights reserved.
  * The sample is not intended for production use.  Provided "as is".
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 package com.sap.iotservices.gateway.interceptor.managers;
