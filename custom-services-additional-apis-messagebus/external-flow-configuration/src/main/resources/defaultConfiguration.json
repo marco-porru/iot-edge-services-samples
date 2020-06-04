@@ -5,7 +5,7 @@
   "filterMeasurements": false,
   "filterCalculation": false,
   "externalConfigurationTopic": "configuration",
-  "configurationFile": "C:\\Users\\i333269\\Desktop\\defaultConfiguration.json",
+  "configurationFile": "defaultConfiguration.json",
   "filteredObjects": [
     {
       "capabilityAlternateId": "power",
