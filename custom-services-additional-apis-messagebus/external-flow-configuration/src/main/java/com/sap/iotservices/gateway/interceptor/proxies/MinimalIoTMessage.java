@@ -1,9 +1,9 @@
 package com.sap.iotservices.gateway.interceptor.proxies;
 
 public class MinimalIoTMessage {
-	String capabilityAlternateId;
-	String sensorAlternateId;
-	String sensorTypeAlternateId;
+	private String capabilityAlternateId;
+	private String sensorAlternateId;
+	private String sensorTypeAlternateId;
 
 	public MinimalIoTMessage() {
 		super();

@@ -4,8 +4,8 @@ import org.apache.commons.lang.StringUtils;
 
 public class ExtendedCustomConfiguration
 extends CustomConfiguration {
-	String externalConfigurationTopic;
-	String configurationFile;
+	private String externalConfigurationTopic;
+	private String configurationFile;
 
 	public ExtendedCustomConfiguration() {
 		super();

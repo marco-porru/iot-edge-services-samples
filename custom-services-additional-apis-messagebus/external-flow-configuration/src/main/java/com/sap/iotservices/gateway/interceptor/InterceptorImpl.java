@@ -17,8 +17,7 @@ implements IGatewayInterceptor {
 	private static final Logger log = LoggerFactory.getLogger(InterceptorImpl.class);
 
 	@Override
-	public void processObject(String pointcutName, Object... args)
-	throws Exception {
+	public void processObject(String pointcutName, Object... args) {
 		try {
 			IoTServicesPointcut pointcut = IoTServicesPointcut.valueOf(pointcutName);
 			switch (pointcut) {

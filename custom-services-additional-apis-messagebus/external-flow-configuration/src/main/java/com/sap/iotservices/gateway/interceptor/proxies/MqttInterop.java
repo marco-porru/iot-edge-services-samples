@@ -102,7 +102,7 @@ public class MqttInterop {
 	}
 
 	public static void sendMessage(String topic, String content) {
-		MqttMessage message = null;
+		MqttMessage message;
 		try {
 			message = new MqttMessage(mapper.writeValueAsString(content).getBytes(Charset.defaultCharset()));
 		} catch (JsonProcessingException e) {

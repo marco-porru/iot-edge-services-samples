@@ -19,7 +19,7 @@ public class EdgeApiExtension
 implements IEdgeApiExtension {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(EdgeApiExtension.class);
-	Random r = new java.util.Random();
+	private Random r = new java.util.Random();
 
 	@Activate
 	public void startService() {

@@ -8,12 +8,12 @@ import java.util.List;
 
 public class CustomConfiguration {
 
-	Float variance;
-	Float pressureScale;
-	Boolean ingestionEnabled;
-	Boolean filterMeasurements;
-	Boolean filterCalculation;
-	List<MessageFilter> filteredObjects;
+	private Float variance;
+	private Float pressureScale;
+	private Boolean ingestionEnabled;
+	private Boolean filterMeasurements;
+	private Boolean filterCalculation;
+	private List<MessageFilter> filteredObjects;
 
 	// default constructor
 	public CustomConfiguration() {

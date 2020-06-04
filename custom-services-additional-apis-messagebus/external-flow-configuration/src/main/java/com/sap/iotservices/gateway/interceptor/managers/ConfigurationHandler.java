@@ -26,9 +26,9 @@ import com.sap.iotservices.gateway.interceptor.proxies.ExtendedCustomConfigurati
 
 public class ConfigurationHandler {
 	private static final Logger LOGGER = LoggerFactory.getLogger(ConfigurationHandler.class); // logger
-	private static final String BASE_PATH = "./../edgeservices/"; // base path for custom configuration, same of other
-																	// services
-	private static final String UNIFORM_PATH_SEPARATOR = "/"; // linux/windows valid file separator
+	private static final String BASE_PATH = "./../edgeservices/"; // base path for custom configuration, same path
+																// of the others Edge service core services
+	private static final String UNIFORM_PATH_SEPARATOR = File.separator; // linux/windows valid file separator
 
 	private static final ObjectMapper mapper = new ObjectMapper()
 		.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
@@ -53,8 +53,8 @@ public class ConfigurationHandler {
 			defaultConfiguration = loadDefaultConfiguration();
 		}
 		// existing file paths
-		String jsonFile = BASE_PATH + serviceName + "/" + serviceName + ".json";
-		String fingerprintFile = BASE_PATH + serviceName + "/" + serviceName + "_fingerprint.txt";
+		String jsonFile = BASE_PATH + serviceName + UNIFORM_PATH_SEPARATOR + serviceName + ".json";
+		String fingerprintFile = BASE_PATH + serviceName + UNIFORM_PATH_SEPARATOR + serviceName + "_fingerprint.txt";
 		CustomConfiguration fromFile = null;
 		String content = null;
 		String fingerprint = null;
@@ -110,6 +110,7 @@ public class ConfigurationHandler {
 		ExtendedCustomConfiguration conf = extractCustomConfiguration(content);
 		if (conf == null) {
 			// configuration not valid
+			LOGGER.warn("Received invalid configuration: {}", content);
 			return null;
 		}
 		List<String> additionalConfFile = extractPathAndName(conf.getConfigurationFile());
@@ -123,7 +124,7 @@ public class ConfigurationHandler {
 				return null;
 			}
 		}
-		if (!additionalConfFile.isEmpty() && additionalConfFile.size() > 1) {
+		if (!additionalConfFile.isEmpty() && additionalConfFile.size() > 0) {
 			path = new File(additionalConfFile.get(0));
 			if (!path.exists()) {
 				boolean created = path.mkdirs();
@@ -186,16 +187,16 @@ public class ConfigurationHandler {
 	 * @return default configuration object
 	 */
 	public static CustomConfiguration loadDefaultConfiguration() {
-		// load default file from classloader
-		InputStream stream = ConfigurationHandler.class.getClassLoader()
-			.getResourceAsStream("defaultConfiguration.json");
-		if (stream == null) {
-			LOGGER.error("No default configuration file");
-			return null;
-		}
 		String content = null;
 		CustomConfiguration config = null;
-		try {
+
+		// load default file from classloader
+		try (InputStream stream = ConfigurationHandler.class.getClassLoader()
+				.getResourceAsStream("defaultConfiguration.json")) {
+			if (stream == null) {
+				LOGGER.error("No default configuration file");
+				return null;
+			}
 			// convert the stream to a string
 			content = IOUtils.toString(stream, Charset.defaultCharset().name());
 		} catch (IOException e) {

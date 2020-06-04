@@ -2,12 +2,11 @@ package com.sap.iotservices.gateway.interceptor;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.Dictionary;
 import java.util.Hashtable;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.commons.lang.StringUtils;
@@ -39,7 +38,7 @@ import com.sap.iotservices.utils.DSUtils;
 /**
  * This class starts the actual implementation for the Interceptor
  */
-@Component(immediate = true, service = {})
+@Component(immediate = true)
 public class ExternalFlowActivator
 implements ServiceListener, EventHandler {
 
@@ -48,14 +47,15 @@ implements ServiceListener, EventHandler {
 	private static CustomConfiguration configuration;
 	private static boolean initialized = false;
 	private static String lastSuccessfulFingerprint;
-	private static AtomicReference<IConfigStatusService> configStatusService = new AtomicReference<>(); // NOSONAR
-	private static Object lock = new Object();
+	private static AtomicReference<IConfigStatusService> configStatusService = new AtomicReference<>();
+	private static final Object lock = new Object();
 	private static volatile boolean ingestionEnabled = true;
 	/**
 	 * Interceptor Manager
 	 */
 	private static AtomicReference<IGatewayInterceptorService> interceptorMngr = new AtomicReference<>();
 	private boolean registered = false;
+	private IGatewayInterceptor interceptor;
 
 	public static boolean isInitialized() {
 		return initialized;
@@ -122,7 +122,7 @@ implements ServiceListener, EventHandler {
 		setConfiguration(ConfigurationHandler.loadConfigurationFromDisk(defaultConfig, EVENT_TOPIC));
 		setLastSuccessfulFingerprint(ConfigurationHandler.getLastFingerprint());
 		// fallback to default
-		if (configuration == null) {
+		if (configuration == null && defaultConfig != null) {
 			log.debug("Starting with default configuration");
 			setConfiguration(defaultConfig);
 			setLastSuccessfulFingerprint(null);
@@ -170,7 +170,7 @@ implements ServiceListener, EventHandler {
 		bundleContext.registerService(EventHandler.class, this, properties);
 		com.sap.iotservices.gateway.interceptor.ExternalFlowActivator.initConfiguration();
 		startNewMqtt();
-
+		this.interceptor = new InterceptorImpl();
 
 		new Thread(() -> {
 			IGatewayInterceptorService interceptorMng = getInterceptorManager();
@@ -178,6 +178,7 @@ implements ServiceListener, EventHandler {
 			synchronized (lock) {
 				if ((interceptorMng != null) && (!registered)) {
 					log.info("Registering implementation of the flow interceptor");
+					registered = interceptorMng.addInterceptor(interceptor);
 				}
 			}
 		}).start();
@@ -187,6 +188,16 @@ implements ServiceListener, EventHandler {
 	@Deactivate
 	public void stop(BundleContext bundleContext) {
 		log.info("Stopping External Flow...");
+		if (registered){
+			IGatewayInterceptorService interceptorMng = getInterceptorManager();
+
+			synchronized (lock) {
+				if ((interceptorMng != null) && (!registered)) {
+					log.info("Unregistering implementation of the flow interceptor");
+					interceptorMng.removeInterceptor(interceptor);
+				}
+			}
+		}
 	}
 
 	void unsetConfigStatusService(IConfigStatusService arg) {
@@ -216,7 +227,7 @@ implements ServiceListener, EventHandler {
 			if (configStatus != null) {
 				try {
 					String configFileContents = new String(Files.readAllBytes(configFile.toPath()),
-						StandardCharsets.UTF_8);
+							Charset.defaultCharset());
 					log.info("Config File Contents:\n{}", configFileContents);
 					ExtendedCustomConfiguration customConfiguration = ConfigurationHandler
 						.writeConfigurationToDisk(EVENT_TOPIC, configFileContents, fingerprint);

@@ -36,7 +36,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Path(EDGE_API_BASE_PATH_TENANT + "/extended")
 public class InteroperabilityModuleActivator
 implements NettyService {
-	private static final Logger LOGGER = LoggerFactory.getLogger(InteroperabilityModuleActivator.class);
 	private IEdgeApiExtension edgeApiExtension;
 
 	@Reference(cardinality = ReferenceCardinality.MANDATORY, policy = ReferencePolicy.DYNAMIC)
@@ -52,7 +51,7 @@ implements NettyService {
 	@Path("uptime")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Operation(summary = "Returns the UPTIME", description = "The endpoint gives the uptime of the Edge Platform", responses = {
-		@ApiResponse(responseCode = "200", description = "Successfully returned sensors.", content = @Content(array = @ArraySchema(schema = @Schema(implementation = SensorBean.class)))),
+		@ApiResponse(responseCode = "200", description = "Successfully returned time.", content = @Content(schema = @Schema(implementation = Long.class))),
 		@ApiResponse(responseCode = "400", description = "Malformed HTTP request", content = @Content(schema = @Schema(implementation = BaseHttpResponse.class))) })
 	public long getUptime(
 		@Parameter(description = "TenantId", required = true) @PathParam("TenantId") String tenantId) {
@@ -64,7 +63,7 @@ implements NettyService {
 	@Path("downtime")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Operation(summary = "Returns the DOWNTIME", description = "The endpoint returns the downtime of the system, computed from the startup of the system", responses = {
-		@ApiResponse(responseCode = "200", description = "Successfully returned sensors.", content = @Content(array = @ArraySchema(schema = @Schema(implementation = SensorBean.class)))),
+		@ApiResponse(responseCode = "200", description = "Successfully returned time.", content = @Content(schema = @Schema(implementation = Long.class))),
 		@ApiResponse(responseCode = "400", description = "Malformed HTTP request", content = @Content(schema = @Schema(implementation = BaseHttpResponse.class))) })
 	public long getDowntime(
 		@Parameter(description = "TenantId", required = true) @PathParam("tenantId") String tenantId) {
